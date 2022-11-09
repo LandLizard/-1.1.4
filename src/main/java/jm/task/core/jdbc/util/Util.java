@@ -10,12 +10,17 @@ public class Util {
     private static final String PASS = "7953";
     private static final String URL = "jdbc:mysql://localhost:3306/my_db";
 
-    public static void connectToDB() {
+    public static Connection connectToDB() {
+        Connection connection;
 
-        try (Connection connection = DriverManager.getConnection(URL, USER, PASS)) {
-            System.out.println("Successfully connect to DB");
+        try {
+            connection = DriverManager.getConnection(URL, USER, PASS);
+            connection.setAutoCommit(false);
+            System.out.println("Successfully connected to DB");
         } catch (SQLException e) {
-            throw new RuntimeException("Failed connection to DB");
+            System.out.println("Failed connection to DB");
+            throw new RuntimeException(e);
         }
+        return connection;
     }
 }
