@@ -1,5 +1,12 @@
 package jm.task.core.jdbc.util;
 
+import jm.task.core.jdbc.model.User;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -10,10 +17,11 @@ public class Util {
     private static final String USER = "root";
     private static final String PASS = "7953";
     private static final String URL = "jdbc:mysql://localhost:3306/my_db";
+    private static final String DIALECT = "org.hibernate.dialect.MySQL5Dialect";
+    private static Connection connection;
+    private static SessionFactory sessionFactory;
 
     public static Connection connectToDB() {
-        Connection connection = null;
-
         try {
             connection = DriverManager.getConnection(URL, USER, PASS); //Connect to DB using Connector JDBC
         } catch (SQLException e) {
@@ -21,5 +29,31 @@ public class Util {
             e.printStackTrace();
         }
         return connection;
+    }
+
+    public static SessionFactory getSFConnect() {
+        if (sessionFactory == null) {
+            try {
+                Configuration configuration = new Configuration();
+                configuration.addAnnotatedClass(User.class);
+                /*
+                Setting connection to DB without xml file
+                 */
+                configuration.setProperty(Environment.URL, URL);
+                configuration.setProperty(Environment.USER, USER);
+                configuration.setProperty(Environment.PASS, PASS);
+                configuration.setProperty(Environment.DIALECT, DIALECT);
+                configuration.setProperty(Environment.SHOW_SQL, "true");
+                configuration.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+                StandardServiceRegistryBuilder SSRBuilder = new StandardServiceRegistryBuilder();
+                SSRBuilder.applySettings(configuration.getProperties());
+                sessionFactory = configuration.buildSessionFactory(SSRBuilder.build());
+                System.out.println("Successfully connected to DB");
+            } catch (HibernateException e) {
+                System.out.println("Failed connection to DB");
+                e.printStackTrace();
+            }
+        }
+        return sessionFactory;
     }
 }
