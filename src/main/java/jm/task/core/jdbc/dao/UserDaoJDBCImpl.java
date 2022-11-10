@@ -19,7 +19,7 @@ public class UserDaoJDBCImpl implements UserDao {
         String tableProp = """
                     create table if not exists user (
                     id int auto_increment primary key,
-                    firstName varchar(30),
+                    name varchar(30),
                     lastName varchar(30),
                     age tinyint
                     );
@@ -29,7 +29,7 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.execute(tableProp);
             System.out.println("Successfully created the table");
         } catch (SQLException e) {
-            System.out.println("Failed creation the table");
+            System.out.println("Failed to create the table");
             e.printStackTrace();
         }
     }
@@ -37,7 +37,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("drop table if exists User;");
+            statement.executeUpdate("drop table if exists user;");
             System.out.println("Successfully removed the table");
         } catch (SQLException e) {
             System.out.println("Failed to remove the table");
@@ -47,7 +47,7 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        String saveUser = "insert into User (firstName, lastName, age) values (?,?,?);";
+        String saveUser = "insert into user (name, lastName, age) values (?,?,?);";
 
         try (PreparedStatement pStatement = connection.prepareStatement(saveUser)) {
             pStatement.setString(1, name);
@@ -78,11 +78,12 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
-        String getUsers = "select * from User;";
+        String getUsers = "select * from user;";
 
         try (ResultSet resultSet = connection.createStatement().executeQuery(getUsers)) {
 
-            /*There are multiple SQl statements in this method
+            /*
+            There are multiple SQl statements in this method
             which should execute in one transaction.
             Then setting auto commit to false
              */
@@ -90,7 +91,7 @@ public class UserDaoJDBCImpl implements UserDao {
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
-                user.setName(resultSet.getString("firstName"));
+                user.setName(resultSet.getString("name"));
                 user.setLastName(resultSet.getString("lastName"));
                 user.setAge(resultSet.getByte("age"));
                 userList.add(user);
@@ -108,7 +109,7 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public void cleanUsersTable() {
         try (Statement statement = connection.createStatement()) {
-            statement.execute("truncate table User;");
+            statement.execute("truncate table user;");
             System.out.println("Successfully clean the table");
         } catch (SQLException e) {
             System.out.println("Failed to clean the table");
