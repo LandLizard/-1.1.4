@@ -89,7 +89,8 @@ public class UserDaoHibernateImpl implements UserDao {
 
         try (Session session = sessionFactory.getCurrentSession()) {
             session.beginTransaction();
-            allUsers = session.createQuery("select N from User N", User.class).getResultList();
+            allUsers = session.createQuery("select N from User N", User.class).list();
+            System.out.println(allUsers);
         } catch (RuntimeException e) {
             System.out.println("Failed to obtain users");
             e.printStackTrace();
@@ -101,7 +102,7 @@ public class UserDaoHibernateImpl implements UserDao {
     public void cleanUsersTable() {
         try (Session session = sessionFactory.getCurrentSession()) {
             Transaction transaction = session.beginTransaction();
-            session.createSQLQuery("delete from user;");
+            session.createSQLQuery("delete from my_db.user;").addEntity(User.class).executeUpdate();
             transaction.commit();
             System.out.println("Successfully cleaned the table");
         } catch (RuntimeException e) {
