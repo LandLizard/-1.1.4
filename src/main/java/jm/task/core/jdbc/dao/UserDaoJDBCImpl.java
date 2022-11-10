@@ -69,7 +69,6 @@ public class UserDaoJDBCImpl implements UserDao {
             pStatement.setLong(1, id);
             pStatement.execute();
             System.out.println("Successfully removed user " + id);
-            connection.commit();
         } catch (SQLException e) {
             System.out.println("Failed to remove the user " + id);
             e.printStackTrace();
@@ -79,8 +78,15 @@ public class UserDaoJDBCImpl implements UserDao {
     @Override
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
+        String getUsers = "select * from User;";
 
-        try (ResultSet resultSet = connection.createStatement().executeQuery("select * from User;")) {
+        try (ResultSet resultSet = connection.createStatement().executeQuery(getUsers)) {
+
+            /*There are multiple SQl statements in this method
+            which should execute in one transaction.
+            Then setting auto commit to false
+             */
+            connection.setAutoCommit(false);
             while (resultSet.next()) {
                 User user = new User();
                 user.setId(resultSet.getLong("id"));
@@ -91,6 +97,7 @@ public class UserDaoJDBCImpl implements UserDao {
                 System.out.println(user);
             }
             connection.commit();
+            connection.setAutoCommit(true); //Setup auto commit to default for perhaps reuse
         } catch (SQLException e) {
             System.out.println("Failed to obtain users");
             e.printStackTrace();

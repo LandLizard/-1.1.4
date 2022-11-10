@@ -6,20 +6,19 @@ import java.sql.SQLException;
 
 public class Util {
 
+    //MySQL settings
     private static final String USER = "root";
     private static final String PASS = "7953";
     private static final String URL = "jdbc:mysql://localhost:3306/my_db";
 
     public static Connection connectToDB() {
-        Connection connection;
+        Connection connection = null;
 
         try {
-            connection = DriverManager.getConnection(URL, USER, PASS);
-            connection.setAutoCommit(false);
-            System.out.println("Successfully connected to DB");
+            connection = DriverManager.getConnection(URL, USER, PASS); //Connect to DB using Connector JDBC
         } catch (SQLException e) {
             System.out.println("Failed connection to DB");
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return connection;
     }
