@@ -79,8 +79,8 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> userList = new ArrayList<>();
 
         try (Connection connection = Util.connectToDB(); Statement statement =
-                connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery("select * from user;");
+                connection.createStatement(); ResultSet resultSet =
+                statement.executeQuery("select * from user;")) {
 
             /*There are multiple SQl statements in this method
             which should execute in one transaction.
