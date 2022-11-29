@@ -14,6 +14,7 @@ public class UserDaoJDBCImpl implements UserDao {
     public UserDaoJDBCImpl() {
 
     }
+
     @Override
     public void createUsersTable() {
         String tableProp = """
