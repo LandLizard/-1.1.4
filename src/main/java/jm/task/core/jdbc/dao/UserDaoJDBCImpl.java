@@ -9,8 +9,6 @@ import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
 
-    private final Connection connection = Util.connectToDB();
-
     public UserDaoJDBCImpl() {
 
     }
@@ -26,7 +24,8 @@ public class UserDaoJDBCImpl implements UserDao {
                     );
                     """;
 
-        try (Statement statement = connection.createStatement()) {
+        try (Connection connection = Util.connectToDB(); Statement statement =
+                connection.createStatement()) {
             statement.execute(tableProp);
             System.out.println("Successfully created the table");
         } catch (SQLException e) {
@@ -37,7 +36,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
-        try (Statement statement = connection.createStatement()) {
+        try (Connection connection = Util.connectToDB(); Statement statement =
+                connection.createStatement()) {
             statement.executeUpdate("drop table if exists user;");
             System.out.println("Successfully removed the table");
         } catch (SQLException e) {
@@ -50,7 +50,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public void saveUser(String name, String lastName, byte age) {
         String saveUser = "insert into user (name, lastName, age) values (?,?,?);";
 
-        try (PreparedStatement pStatement = connection.prepareStatement(saveUser)) {
+        try (Connection connection = Util.connectToDB(); PreparedStatement pStatement =
+                connection.prepareStatement(saveUser)) {
             pStatement.setString(1, name);
             pStatement.setString(2, lastName);
             pStatement.setByte(3, age);
@@ -66,7 +67,8 @@ public class UserDaoJDBCImpl implements UserDao {
     public void removeUserById(long id) {
         String removeUserById= "delete from user where id = ?";
 
-        try (PreparedStatement pStatement = connection.prepareStatement(removeUserById)) {
+        try (Connection connection = Util.connectToDB(); PreparedStatement pStatement =
+                connection.prepareStatement(removeUserById)) {
             pStatement.setLong(1, id);
             pStatement.execute();
             System.out.println("Successfully removed user " + id);
@@ -81,7 +83,8 @@ public class UserDaoJDBCImpl implements UserDao {
         List<User> userList = new ArrayList<>();
         String getUsers = "select * from user;";
 
-        try (ResultSet resultSet = connection.createStatement().executeQuery(getUsers)) {
+        try (Connection connection = Util.connectToDB(); ResultSet resultSet =
+                connection.createStatement().executeQuery(getUsers)) {
 
             /*
             There are multiple SQl statements in this method
@@ -96,7 +99,6 @@ public class UserDaoJDBCImpl implements UserDao {
                 user.setLastName(resultSet.getString("lastName"));
                 user.setAge(resultSet.getByte("age"));
                 userList.add(user);
-                System.out.println(user);
             }
             connection.commit();
             connection.setAutoCommit(true); //Setup auto commit to default for perhaps reuse
@@ -109,7 +111,8 @@ public class UserDaoJDBCImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        try (Statement statement = connection.createStatement()) {
+        try (Connection connection = Util.connectToDB(); Statement statement =
+                connection.createStatement()) {
             statement.execute("truncate table user;");
             System.out.println("Successfully clean the table");
         } catch (SQLException e) {
