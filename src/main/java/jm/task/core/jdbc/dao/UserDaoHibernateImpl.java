@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
 
-    private final SessionFactory sessionFactory = Util.hibernateConn().buildSessionFactory();
+    private final SessionFactory sessionFactory = Util.getHibernateSF();
     private Session session;
     private Transaction transaction;
 
