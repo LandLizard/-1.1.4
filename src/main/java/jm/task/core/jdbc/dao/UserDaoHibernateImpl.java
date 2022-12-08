@@ -11,7 +11,7 @@ import java.util.List;
 public class UserDaoHibernateImpl implements UserDao {
 
     private final SessionFactory sessionFactory = Util.getHibernateSF();
-    private Transaction transaction;
+    private Transaction transaction = null;
 
     public UserDaoHibernateImpl() {
 
@@ -29,7 +29,7 @@ public class UserDaoHibernateImpl implements UserDao {
                     """;
 
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction(); //Initialization  of Transaction object
+            transaction = session.beginTransaction();
             session.createSQLQuery(tableProp).executeUpdate();
             transaction.commit();
             System.out.println("Successfully created the table");
@@ -45,7 +45,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void dropUsersTable() {
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction(); //Initialization  of Transaction object
+            transaction = session.beginTransaction();
             session.createSQLQuery("drop table if exists user;").executeUpdate();
             transaction.commit();
             System.out.println("Successfully removed the table");
@@ -63,7 +63,7 @@ public class UserDaoHibernateImpl implements UserDao {
         User user = new User(name, lastName, age);
 
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction(); //Initialization  of Transaction object
+            transaction = session.beginTransaction();
             session.saveOrUpdate(user);
             transaction.commit();
             System.out.println("User " + name + " successfully added or updated");
@@ -79,7 +79,7 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void removeUserById(long id) {
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction(); //Initialization  of Transaction object
+            transaction = session.beginTransaction();
             User user = session.get(User.class, id);
             if (user != null) {
                 session.delete(user);
@@ -100,15 +100,10 @@ public class UserDaoHibernateImpl implements UserDao {
         List <User> allUsers = null;
 
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction(); //Initialization  of Transaction object
             allUsers = session.createQuery("select N from User N", User.class).list();
-            transaction.commit();
             System.out.println(allUsers);
         } catch (RuntimeException e) {
             System.out.println("Failed to obtain users");
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
         return allUsers;
@@ -116,7 +111,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
-        List <User> users = null;
+        List <User> users;
 
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction(); //Initialization of Transaction object

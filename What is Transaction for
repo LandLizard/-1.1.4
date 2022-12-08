@@ -1,0 +1,3 @@
+Transaction (org.hibernate.Transaction) используется для подтверждения или отката транзакции к базе данных,
+ведь объект Session не имеет собственных методов для этого, необходимо обращаться к объекту Transaction с помощью
+beginTransaction() и getTransaction(). Следует применять Transaction при изменении данных в таблицах.
