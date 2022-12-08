@@ -11,7 +11,6 @@ import java.util.List;
 public class UserDaoHibernateImpl implements UserDao {
 
     private final SessionFactory sessionFactory = Util.getHibernateSF();
-    private Transaction transaction = null;
 
     public UserDaoHibernateImpl() {
 
@@ -19,6 +18,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
+        Transaction transaction = null;
         String tableProp = """
                     create table if not exists user (
                     id int auto_increment primary key,
@@ -44,6 +44,8 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void dropUsersTable() {
+        Transaction transaction = null;
+
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             session.createSQLQuery("drop table if exists user;").executeUpdate();
@@ -60,24 +62,22 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+
         User user = new User(name, lastName, age);
 
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
             session.saveOrUpdate(user);
-            transaction.commit();
             System.out.println("User " + name + " successfully added or updated");
         } catch (RuntimeException e) {
             System.out.println("Failed to add the user");
-            if (transaction.isActive()) {
-                transaction.rollback();
-            }
             e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
+        Transaction transaction = null;
+
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
             User user = session.get(User.class, id);
@@ -111,6 +111,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
+        Transaction transaction = null;
         List <User> users;
 
         try (Session session = sessionFactory.openSession()) {
